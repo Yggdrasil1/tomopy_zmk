@@ -74,11 +74,15 @@ if __name__ == '__main__':
         List_names.append(loopnames)
         assert loopnames != ""
 
-    for name in List_names:
+    measure_file = dxchange.reader.read_edf(List_names[1], slc=None)
 
-        dxchange.reader.read_edf(name, slc=None)
+    proj_ar = np.zeros((number_of_files, number_recon_slices, measure_file.shape[2]))
 
+    for i in range( len(List_names)):
 
+        loopfile=dxchange.reader.read_edf(name, slc=None)
+
+        proj_ar[i]=loopfile[StartSlice:(number_recon_slices + StartSlice), :]
 
 
 
