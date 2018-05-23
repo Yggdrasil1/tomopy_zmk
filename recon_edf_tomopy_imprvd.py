@@ -60,19 +60,19 @@ if __name__ == '__main__':
         loopnames = ""
 
         if (i < 10):
-            loopnames = fname[:-5] + str(i) + '.edf'
+            loopnames = filename[:-5] + str(i) + '.edf'
 
         elif (i < 100):
-            loopnames = fname[:-6] + str(i) + '.edf'
+            loopnames = filename[:-6] + str(i) + '.edf'
 
         elif (i < 1000):
-            loopnames = fname[:-7] + str(i) + '.edf'
+            loopnames = filename[:-7] + str(i) + '.edf'
 
         elif (i < 10000):
-            loopnames = fname[:-8] + str(i) + '.edf'
+            loopnames = filename[:-8] + str(i) + '.edf'
 
         List_names.append(loopnames)
-        assert loopnames != ""
+        assert loopnames != "", "no files are given to the edf.reader"
 
     measure_file = dxchange.reader.read_edf(List_names[1], slc=None)
 
@@ -84,5 +84,10 @@ if __name__ == '__main__':
 
         proj_ar[i]=loopfile[StartSlice:(number_recon_slices + StartSlice), :]
 
+    theta = tomopy.angles(number_of_files)
 
+    if rot_center == 0:
+        rot_center = math.floor(len(proj_ar[0, 0]) / 2)
+        assert rot_center>0, "rot_center is probably wrong"
 
+    proj = tomopy.minus_log(proj_ar)
