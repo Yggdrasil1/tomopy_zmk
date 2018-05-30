@@ -27,16 +27,22 @@ if __name__ == '__main__':
     alg = str(raw_input('Which algorithm do you wish to use? \nSome choises are "gridrec" "fbp": '))
     
     print("so your files are here?: ")
-    print(fname + "/n")
+    print(fname)
     
     print("you start at slice: " + str(StartSlice))
     print("and you want: "+ str(number_recon_slices)+ " Slices")
     
+    
+    
     number_of_files = len(fnmatch.filter(os.listdir(fname), '*.edf'))
-    filename = fnmatch.filter(os.listdir(fname), '*.edf')[0]
+    filename = fname + '/' + fnmatch.filter(os.listdir(fname), '*.edf')[0]
+    
+    print("---" + filename + "---")
     
     savename = fname + "/rec_" +  filename[:-4]
+    
     savedirectory = os.path.dirname(savename)
+    
     if not os.path.exists(savedirectory):
         os.makedirs(savedirectory)
 
@@ -66,11 +72,12 @@ if __name__ == '__main__':
 
    #measure_file = dxchange.reader.read_edf(List_names[1], slc=None)
     
-    measure_file = Image.open(List_names[1])
-    nwidth= measure_file.size[0]/2
-    nheight = measure_file.size[1]/2
+    measure_file = dxchange.reader.read_edf(List_names[0], slc=None)
+    height = measure_file.shape[1]
+    width = measure_file.shape[2]
     
-   
+    measure_file = measure_file.reshape(height,width)
+    
     if number_recon_slices==0:
         number_recon_slices=len(measure_file[0])-StartSlice
 
@@ -80,7 +87,7 @@ if __name__ == '__main__':
 
         #loopfile=dxchange.reader.read_edf(List_names[i], slc=None)
         
-        loopfile = Image.open(List_names[i])
+        loopfile = dxchange.reader.read_edf(List_names[1], slc=None)
         
         resl_loopfile = loopfile.resize(nwidth, nheight, Image.LANCZOS)
 
