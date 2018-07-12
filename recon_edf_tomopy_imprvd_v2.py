@@ -8,6 +8,7 @@ import fnmatch
 import os
 from matplotlib import pyplot as plt
 from scipy.misc import imresize
+from scipy import ndimage
 import time
 import datetime
 import math
@@ -23,7 +24,7 @@ if __name__ == '__main__':
                        ' the reconstruction?' + '\n The first one is 0: '))
     
     number_recon_slices = int(input('How many slices do you want to reconstruct ' +
-                                'after the first one?: '))
+                                'after the first one? +\n Type 0 for all: '))
     
     rot_center = int(input('Where is the center of rotation? ' +
                            '\nType 0 if you dont know: '))
@@ -56,7 +57,9 @@ if __name__ == '__main__':
     
     print("---" + filename + "---")
     
-    savename = output_folder + "/rec_" + alg + "/" + os.path.splitext(os.path.basename(filename[:-4]))[0]
+    sample_name = os.path.splitext(os.path.basename(filename[:-4]))[0]
+    
+    savename = output_folder + "/rec_" + sample_name + "_"+ alg + "/" + sample_name
     
     savedirectory = os.path.dirname(savename)
     
@@ -105,10 +108,14 @@ if __name__ == '__main__':
         
         loopfile = dxchange.reader.read_edf(List_names[i], slc=None)
         
-        resl_loopfile = imresize(
+        '''resl_loopfile = imresize(
                 loopfile[0,StartSlice:(number_recon_slices + StartSlice), :],
                 resize_parameter,
-                mode='F')
+                mode='F') '''
+        resl_loopfile = ndimage.zoom(
+                loopfile[0,StartSlice:(number_recon_slices + StartSlice), :],
+                0.5,
+                )
 
         proj_ar.append(resl_loopfile)
         
@@ -120,18 +127,21 @@ if __name__ == '__main__':
     if rot_center == 0:
         rot_center = math.floor(len(proj_ar[0, 0]) / 2)
         assert rot_center>0, "rot_center is probably wrong"
+        assert rot_center<len(proj_ar[0, 0]), "Rotation center is outside of the image"
 
     proj = tomopy.minus_log(proj_ar)
     print("")
     print("begin reconstruction using ["+alg+ "] approach...")  
     rec = tomopy.recon(proj, theta, center=rot_center, algorithm=alg)
     
+    print("applying a circular mask to the reconstructed data")
     # Mask each reconstructed slice with a circle.
     rec1 = tomopy.circ_mask(rec, axis=0, ratio=0.95)
     #plt.show(block=False)
     #plt.imshow(rec1[0])
     #plt.show
     
+    print("writing the files as 'TIFF's to the output direction ")
     # Write data as stack of TIFs.
     dxchange.write_tiff_stack(rec1, savename+'_recon_')    
     
