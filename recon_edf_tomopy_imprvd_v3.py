@@ -20,58 +20,12 @@ if __name__ == '__main__':
     fname = str(raw_input('Please paste the absolut path to the edf-files here: '))
     assert fname != "", "Your filepath cannot be empty!"
     
-    StartSlice = int(input('At which Slice do you wish to start' + 
-                       ' the reconstruction?' + '\n The first one is 0: '))
-    
-    number_recon_slices = int(input('How many slices do you want to reconstruct ' +
-                                'after the first one? +\n Type 0 for all: '))
-    
-    rot_center = int(input('Where is the center of rotation? ' +
-                           '\nType 0 if you dont know: '))
-    
-
-    alg = str(raw_input('Which algorithm do you wish to use? ' +
-                        '\nSome choises are "gridrec" "fbp": '))
-    
-    factor_question = str(raw_input('Do you wish to resize the image ' +
-                                    '(to handle big datasets)? (y/n): '))
-    
-    if factor_question in ['y','Y','Yes','yes']:
-        
-        resize_parameter = input('Please type either the new image dimensions '
-                                  +'[eg. (1000x800)] \n'
-                                  +'or the % of the original size [eg. 50 = 50%]: ')
-        
-    output_folder = str(raw_input('Where do you want to safe the resulting images'
-                                  +' (a new folder gets created)?: '))
-    
-    print("\n so your files are here?: ")
-    print(fname)
-    rot_center = int(input('Where is the center of rotation? \nType 0 if you dont know: '))
-
-    
-    print("you start at slice: " + str(StartSlice))
-    print("and you want: "+ str(number_recon_slices)+ " Slices")
-    
-    
-    
     number_of_files = len(fnmatch.filter(os.listdir(fname), '*.edf'))
     filename = fname + '/' + fnmatch.filter(os.listdir(fname), '*.edf')[0]
+    print("--- The first file: " + filename + " ---\n")
     
-    print("---" + filename + "---")
-    
-    sample_name = os.path.splitext(os.path.basename(filename[:-4]))[0]
-    
-    savename = output_folder + "/rec_" + sample_name + "_"+ alg + "/" + sample_name
-    
-    savedirectory = os.path.dirname(savename)
-    
-    if not os.path.exists(savedirectory):
-        os.makedirs(savedirectory)
-
     List_names = []
 
-    # chose alg from 'fbp', 'gridrec'....
     print("Preparing: ")
     
     for i in range(number_of_files):
@@ -100,6 +54,51 @@ if __name__ == '__main__':
     width = measure_file.shape[2]
     
     measure_file = measure_file.reshape(height,width)
+    print("Your original images have the following size: ", measure_file.shape)
+    
+    #User chooses at which height the reconstruction should start
+    StartSlice = int(input('At which Slice do you wish to start' + 
+                       ' the reconstruction?' + '\nThe first one is 0: '))
+    
+    #User chooses how many slides he want to have after the StartSlice
+    number_recon_slices = int(input('How many slices do you want to consider ' +
+                                'after the first one? '+
+                                '\n(Before resizing) '
+                                '\nType 0 for all: '))
+    
+    rot_center = int(input('Where is the center of rotation? ' +
+                           '\nType 0 if you dont know: '))
+    
+    alg = str(raw_input('Which algorithm do you wish to use? ' +
+                        '\nSome choises are "gridrec" "fbp": '))
+    
+    factor_question = str(raw_input('Do you wish to resize the image ' +
+                                    '(to handle big datasets)? (y/n): '))
+    
+    if factor_question in ['y','Y','Yes','yes']:
+        
+        resize_parameter = input('Please type the fraction of the size '+
+                                 '\n(e.g. 0.5 for 50% smaller height and widths):  ')
+        
+    output_folder = str(raw_input('Where do you want to safe the resulting images'
+                                  +' (a new folder gets created)?: '))
+    
+    print("\n so your files are here?: ")
+    print(fname)
+    
+    print("you start at slice: " + str(StartSlice))
+    print("and you want: "+ str(number_recon_slices)+ " Slices")
+    
+    sample_name = os.path.splitext(os.path.basename(filename[:-9]))[0]
+    
+    savename = output_folder + "/rec_" + sample_name + alg + "/" + sample_name
+    
+    savedirectory = os.path.dirname(savename)
+    
+    if not os.path.exists(savedirectory):
+        os.makedirs(savedirectory)
+
+    
     
     if number_recon_slices==0:
         number_recon_slices = len(measure_file[0])-StartSlice
@@ -109,15 +108,13 @@ if __name__ == '__main__':
 
     for i in range(len(List_names)):
         
+        #if i == 0:
+            
         loopfile = dxchange.reader.read_edf(List_names[i], slc=None)
         
-        '''resl_loopfile = imresize(
-                loopfile[0,StartSlice:(number_recon_slices + StartSlice), :],
-                resize_parameter,
-                mode='F') '''
         resl_loopfile = ndimage.zoom(
                 loopfile[0,StartSlice:(number_recon_slices + StartSlice), :],
-                0.5,
+                resize_parameter,
                 )
 
         proj_ar.append(resl_loopfile)
@@ -148,7 +145,7 @@ if __name__ == '__main__':
     # Write data as stack of TIFs.
     dxchange.write_tiff_stack(rec1, savename+'_recon_')    
     
-    duration = str(datetime.timedelta(time.time()-time_start))
+    duration = str(datetime.timedelta((time.time()-time_start)/(3600*24)))
     
     print("It took %s (hh:mm:ss) to finish reconstruction" %(duration))
     print("everything finished, find the results here: ",savename)
