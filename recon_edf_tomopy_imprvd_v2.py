@@ -29,6 +29,7 @@ if __name__ == '__main__':
     rot_center = int(input('Where is the center of rotation? ' +
                            '\nType 0 if you dont know: '))
     
+
     alg = str(raw_input('Which algorithm do you wish to use? ' +
                         '\nSome choises are "gridrec" "fbp": '))
     
@@ -46,6 +47,8 @@ if __name__ == '__main__':
     
     print("\n so your files are here?: ")
     print(fname)
+    rot_center = int(input('Where is the center of rotation? \nType 0 if you dont know: '))
+
     
     print("you start at slice: " + str(StartSlice))
     print("and you want: "+ str(number_recon_slices)+ " Slices")
