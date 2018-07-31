@@ -1,0 +1,88 @@
+This manual gives an instruction on what i had to do, to make the use of the different python 
+versions as easy as possible without them interfering each other. I also did some changes to 
+the linux system because i wanted the execution of python scripts to be as simple as possible.
+The motivation for all this was the intriduction of tomopy.
+Tomopy is a python script that allows reconstruction of CT data only using python. It comes
+with several algorithms for reconstruction and was created to be used for data from several 
+X-Ray facilities (like ESRF)
+--- http://dxchange.readthedocs.io/en/latest/source/demo.html ---
+
+Tomopy does not require lots of coding and it has a pretty good documentation with some 
+examples. Also you need to write a script to read in your data and use tomopy on it, most of 
+the things you need to write you can just copy+paste from the examples.
+
+Although tomopy is really easy to use and everything is prepared for you it not as easy to get
+tomopy on your Computer without any extra steps. Tomopy is not a single script that does 
+everything for your. It depends on different libraries and for now only works with python2.7.
+
+There are basically two possible ways to get tomopy running:
+
+	1. You install all required dependencies manually
+	2. You use the Python Platform - Anaconda
+
+I would greatly discourage you to try to install everything by hand because you dont know 
+which scripts of you stop working after you change some of the allready installed 
+dependencies and finding the right versions of all these scripts can be really really hard.
+Luckily there is a super easy way to install it without doing any changes to your allready 
+installed python versions.
+
+///////  Anaconda ///////
+
+Anaconda is program that comes with its own python version and other usefull programs.
+It allows installation of tools like tomopy with also installing all dependencies simultaneously.
+You dont need to think about your previous work or finding the right scripts.
+Anaconda has an own library with all scripts necessary.
+The installation of anaconda is pretty simple, just follow the offical instruction on their 
+website:
+--- https://anaconda.org/anaconda/python
+
+Installing Anaconda didn't enable the use of conda in the terminal for me. If that's the case
+you need to tell Linux where to find the conda command to fully enable all the capabilities of
+anaconda. 
+
+Open a new terminal and run:
+--- conda --version
+
+This should display the version of your anaconda installation, if not please follow the following 
+steps.
+
+  Linux has a list of PATH variables that tell Linux where to look for certain commands, normally
+  you'd just need to type in a terminal:
+  --- export PATH=~anaconda2/bin:$PATH
+
+  Where actual path to the "/bin" folder of your anaconda installation has to be put between the "="
+  and the ":". 
+
+  It may be the case that this only enables the conda command in your terminal temporarily.
+  To permanently enable it you might want to add the export command to the Bash-script 
+  (see further below in section "The Bashrc-file").
+
+Now with anaconda installed you can easily install tomopy by running:
+--- conda install -c conda-forge tomopy
+
+(from the offical website: http://tomopy.readthedocs.io/en/latest/install.html)
+
+If that worked then all you have to do is open the python development environment of your choice
+and start programming. 
+The offical website has some examples on how to use tomopy. For the python reconstruction file 
+i wrote, i basically copy pasted the "gridrec example" and altered all the things that were
+specific for the data i used. 
+ 
+Sadly with installing anaconda not everything is set to run python scripts from a terminal.
+
+
+///////  The Bashrc-file ///////
+
+The Bash-script is a file that stores all kinds of commands that are "executed" as soon as you open
+a new terminal. For example in most of the servers the command "la" lists all objects contained in 
+the folder you were when you typed the command. It's not a command that works on every linux system.
+Someone just wanted a shortcut and created an alias that represents the actual command: "ls -A".
+
+Helping lazy people is only one of the possible uses. The main use is the storing of configurations
+you don't want to apply manually everytime you start the computer.
+
+For instance: installing certain  
+
+
+
+
